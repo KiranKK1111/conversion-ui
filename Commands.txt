@@ -1,0 +1,55 @@
+python tif_to_png_local.py --input-dir "C:\Users\8213167\EDP\NatureRisk\Geo-Map\geo-map-fe-cra\public\geo-tiff" --output-dir "C:\Users\8213167\EDP\NatureRisk\Geo-Map\geo-map-fe-cra\public\gfc-png" --base-url "http://localhost:3000/geo-png" --target-crs EPSG:3857 --threads 8 --max-size 8192
+
+python globio_msa_to_png.py MSA/TerrestrialMSA_2050_SSP1RCP26_World.tif ./Globio_3857_png_tiles/SSP1 --tile_size 2048 --resolution 100
+
+python globio_msa_to_png.py MSA/TerrestrialMSA_2050_SSP3RCP6_World.tif ./Globio_3857_png_tiles/SSP3 --tile_size 2048 --resolution 100
+
+python globio_msa_to_png.py MSA/TerrestrialMSA_2050_SSP5RCP85_World.tif ./Globio_3857_png_tiles/SSP5 --tile_size 2048 --resolution 100
+
+python globio_lu_to_png.py ./LU ./Globio_3857_png_tiles/LU --pixel-size 5000 
+
+
+python aqueduct_gdb_topojson.py --gdb Aq40_Y2023D07M05.gdb --indicator bws --dissolve-by bws_label --chunks 4 --chunks-tmpdir ./_chunks_cache --output bws_annual.topojson
+
+python kba_data_conversion.py kba.gdb kba.topojson
+
+# All three (default — same as before)
+python wdpa_data_conversion.py WDPA_WDOECM_Dec2025_Licensed.gdb /output
+
+# Just one
+python wdpa_data_conversion.py WDPA_WDOECM_Dec2025_Licensed.gdb /output --ramsar
+python wdpa_data_conversion.py WDPA_WDOECM_Dec2025_Licensed.gdb /output --iucn
+python wdpa_data_conversion.py WDPA_WDOECM_Dec2025_Licensed.gdb /output --whs
+
+# Any combination
+python wdpa_data_conversion.py WDPA_WDOECM_Dec2025_Licensed.gdb /output --ramsar --whs
+
+
+
+python scb_assets_distance_topojson.py scb_distance_data.csv sc_assets.topojson
+
+
+
+# Option A — all owners, one file each
+python mm_owner_topojson.py enriched_mm_data_transfer_restored ./output
+
+# Option A — just Glencore
+python mm_owner_topojson.py enriched_mm_data_transfer_restored ./output \
+    --owner-id <GLENCORE_ID>
+
+# Option B — all owners, one file per LEI
+python mm_owner_topojson.py enriched_mm_data_transfer_restored ./output \
+    --per-client
+
+# Option B — just Glencore's LEIs
+python mm_owner_topojson.py enriched_mm_data_transfer_restored ./output \
+    --per-client --owner-id <GLENCORE_ID>
+
+# Option B — one specific LEI only
+python mm_owner_topojson.py enriched_mm_data_transfer_restored ./output \
+    --per-client --owner-id <GLENCORE_ID> \
+    --le-name "Glencore International AG"
+
+# Refresh everything
+python mm_owner_topojson.py enriched_mm_data_transfer_restored ./output \
+    --rebuild-cache
